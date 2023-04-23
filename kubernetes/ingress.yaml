@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: test
+  name: dev-app-test
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "100000"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "100000"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "100000"
+    nginx.ingress.kubernetes.io/proxy-body-size: "64m"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://test.com"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: PUT, GET, POST, OPTIONS, DELETE, PATCH
+    #nginx.ingress.kubernetes.io/enable-cors: "true"
+    #nginx.org/websocket-services: "service-name"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    cert-manager.io/cluster-issuer: letsencrypt-production
+spec:
+  rules:
+    - host: tenancy.klaim.ai
+      http:
+        paths:
+          - path: /nginx(/|$)(.*)
+          #- path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: notes-app-deployment
+                port:
+                  number: 80
+          - path: /app(/|$)(.*)
+          #- path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: notes-app-deployment-2
+                port:
+                  number: 3000
+  tls:
+    - hosts:
+      - tenancy.klaim.ai
+      secretName: dev-app-test-tls
+

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notes-app-cm
+data:
+  key1: value1
+  number1: '1000'
+  boolean1: 'true'

@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notes-app-deployment
+  labels:
+    app: notes-app
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+        type: RollingUpdate #Recreate
+        rollingUpdate:
+            maxSurge: 1
+            maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: notes-app
+  template:
+    metadata:
+      labels:
+        app: notes-app
+    spec:
+      restartPolicy: Never or OnFailure  or Always
+      #imagePullSecrets:  # Nexus, ECR, Dockerhub
+      #  - name: docker-registry
+      #kubectl create secret docker-registry alpha-registry --docker-server=test.azurecr.io --docker-username=‘testuser’ --docker-password=‘pass' --docker-email='test@test’.com -n test
+     
+      #imagePullPolicy: IfNotPresent #Always or Never
+
+      containers:
+      - name: test
+        image: nginx
+        ports:
+        - containerPort: 80
+      - name: notes-app-deployment
+        image: pavansa/notes-app
+        resources:
+              limits:
+                memory: '400Mi'
+                cpu: '400m'
+              requests:
+                memory: '400Mi'
+                cpu: '300m'
+        
+        ports:
+        - containerPort: 3000
+      
+        envFrom:
+          - configMapRef:
+              name: notes-app-cm
+          - secretRef:
+              name: notes-app-secret
+        livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+        readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+    startupProbe:
+      httpGet:
+        path: /healthz
+        port: 3000 
+      failureThreshold: 30
+      periodSeconds: 10
+---
+
+#    initialDelaySeconds: Number of seconds after the container has started before probes are initiated. (default: 0, minimum: 0)
+#    periodSeconds: How often to perform the probe (i.e. frequency). (default: 10, minimum: 1)
+#    timeoutSeconds: Number of seconds after which the probe times out. (default: 1, minimum: 1)
+#    successThreshold: Minimum consecutive successes for the probe to be considered successful after failure. (default: 1, minimum: 1)
+#    failureThreshold: How many failed results were received to transition from a healthy to a failure state. (default: 3, minimum: 1)
