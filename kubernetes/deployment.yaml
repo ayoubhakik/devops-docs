@@ -20,7 +20,7 @@ spec:
       labels:
         app: notes-app
     spec:
-      restartPolicy: Never or OnFailure  or Always
+      restartPolicy: Never #or OnFailure  or Always
       #imagePullSecrets:  # Nexus, ECR, Dockerhub
       #  - name: docker-registry
       #kubectl create secret docker-registry alpha-registry --docker-server=test.azurecr.io --docker-username=‘testuser’ --docker-password=‘pass' --docker-email='test@test’.com -n test
@@ -45,31 +45,31 @@ spec:
         ports:
         - containerPort: 3000
       
-        envFrom:
-          - configMapRef:
-              name: notes-app-cm
-          - secretRef:
-              name: notes-app-secret
-        livenessProbe:
-            httpGet:
-              path: /health
-              port: 3000
-            initialDelaySeconds: 30
-            periodSeconds: 30
-            timeoutSeconds: 10
-        readinessProbe:
-            httpGet:
-              path: /health
-              port: 3000
-            initialDelaySeconds: 30
-            periodSeconds: 30
-            timeoutSeconds: 10
-    startupProbe:
-      httpGet:
-        path: /healthz
-        port: 3000 
-      failureThreshold: 30
-      periodSeconds: 10
+        #envFrom:
+        #  - configMapRef:
+        #      name: notes-app-cm
+        #  - secretRef:
+        #      name: notes-app-secret
+        #livenessProbe:
+        #    httpGet:
+        #      path: /health
+        #     port: 3000
+        #    initialDelaySeconds: 30
+        #    periodSeconds: 30
+        #    timeoutSeconds: 10
+        #readinessProbe:
+         #   httpGet:
+         #     path: /health
+         #     port: 3000
+         #   initialDelaySeconds: 30
+         #   periodSeconds: 30
+         #   timeoutSeconds: 10
+    #startupProbe:
+    #  httpGet:
+    #    path: /healthz
+    #    port: 3000 
+    #  failureThreshold: 30
+    #  periodSeconds: 10
 ---
 
 #    initialDelaySeconds: Number of seconds after the container has started before probes are initiated. (default: 0, minimum: 0)
